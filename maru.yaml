@@ -1,0 +1,16 @@
+maru_version: 0.1.1
+name: msg
+version: 1.0.0
+build_args:
+  GIT_TAG: master
+template_args:
+  flavor: python_conda
+  build:
+    repo_url: https://github.com/YourePrettyGood/msg
+    command: make
+  executable:
+    exe_path: bin/program
+  python_conda:
+    python_version: ""
+    dependencies: numpy bwa samtools biopython=1.53 Pyrex==0.9.9
+    script_path: ""
