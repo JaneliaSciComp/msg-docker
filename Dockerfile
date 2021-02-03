@@ -9,6 +9,7 @@ RUN yum install -y git curl openssh gcc
 RUN yum install -y unzip
 RUN yum install -y make
 RUN yum install -y gcc-c++
+RUN yum install -y gcc-gfortran
 
 # Checkout and build the code
 WORKDIR /app
@@ -25,9 +26,13 @@ WORKDIR /app/dependencies/Python-2.6.6
 RUN ./configure && make && make install
 
 WORKDIR /app/dependencies/R-3.4.0
-#RUN ./configure && make && make install
+RUN ./configure --with-readline=no F77=gfortran \
+    && make && make install
 
 
+
+# test script, will be removed
+COPY testscript.sh /app
 
 
 RUN rm -rf /app/dependencies
@@ -37,12 +42,19 @@ FROM scientificlinux/sl:7
 
 COPY --from=builder / /
 
+
+
 # Add Tini
-ENV TINI_VERSION v0.19.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-RUN chmod +x /tini
-ENTRYPOINT ["/tini", "--"]
+# ENV TINI_VERSION v0.19.0
+# ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+# RUN chmod +x /tini
+# ENTRYPOINT ["/tini", "--"]
 
 # Run your program under Tini
-CMD ["/your/program", "-and", "-its", "arguments"]
+# CMD ["/your/program", "-and", "-its", "arguments"]
 
+
+
+
+# for testing; this runs the test_dependencies.sh script
+ENTRYPOINT ["/bin/sh", "/app/testscript.sh"]
