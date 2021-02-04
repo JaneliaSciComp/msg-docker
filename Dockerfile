@@ -19,6 +19,9 @@ RUN yum install -y libcurl-devel
 # for building samtools
 RUN yum install -y ncurses-devel
 
+# for installing Perl packages
+RUN yum install -y perl-App-cpanminus
+
 # Checkout and build the code
 WORKDIR /app
 RUN git clone --branch $GIT_TAG --depth 1 https://github.com/YourePrettyGood/msg .
@@ -42,7 +45,6 @@ WORKDIR /app/dependencies/bwa-0.5.7
 RUN make && cp ./bwa /usr/local/bin
 
 # R packages
-WORKDIR /app/dependencies
 RUN R -e "install.packages('HiddenMarkov',dependencies=TRUE, repos='http://cran.rstudio.com/')"
 RUN R -e "install.packages('R.methodsS3',dependencies=TRUE, repos='http://cran.rstudio.com/')"
 RUN R -e "install.packages('R.oo',dependencies=TRUE, repos='http://cran.rstudio.com/')"
@@ -60,6 +62,8 @@ RUN python setup.py install
 WORKDIR /app/dependencies/pysam-0.1.2
 RUN python setup.py install
 
+# Perl module
+RUN cpanm IO::Uncompress::Gunzip
 
 # build msg itself and last two executables that share its makefile
 WORKDIR /app
