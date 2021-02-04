@@ -30,6 +30,7 @@ RUN cat *.{tar.gz,tgz} | tar zxvf - -i \
     && cat *.tar.bz2 | tar jxvf - -i \
     && unzip *.zip
 
+# core executables
 WORKDIR /app/dependencies/Python-2.6.6
 RUN ./configure && make && make install
 
@@ -40,10 +41,27 @@ RUN ./configure --with-readline=no --with-x=no F77=gfortran \
 WORKDIR /app/dependencies/bwa-0.5.7
 RUN make && cp ./bwa /usr/local/bin
 
+# R packages
+WORKDIR /app/dependencies
+RUN R -e "install.packages('HiddenMarkov',dependencies=TRUE, repos='http://cran.rstudio.com/')"
+RUN R -e "install.packages('R.methodsS3',dependencies=TRUE, repos='http://cran.rstudio.com/')"
+RUN R -e "install.packages('R.oo',dependencies=TRUE, repos='http://cran.rstudio.com/')"
+
+# Python packages
+WORKDIR /app/dependencies/Pyrex-0.9.9
+RUN python setup.py install
+
+WORKDIR /app/dependencies/numpy-1.5.1
+RUN python setup.py build --fcompiler=gnu95 && python setup.py install
+
+WORKDIR /app/dependencies/biopython-1.53
+RUN python setup.py install
+
+WORKDIR /app/dependencies/pysam-0.1.2
+RUN python setup.py install
 
 
-
-
+# build msg itself and last two executables that share its makefile
 WORKDIR /app
 RUN make && make samtools && make stampy
 
