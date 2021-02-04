@@ -2,7 +2,7 @@ maru_version: 0.1.1
 name: msg
 version: 1.0.0
 build_args:
-  GIT_TAG: master
+  GIT_TAG: dev
 template_args:
   flavor: python_conda
   build:

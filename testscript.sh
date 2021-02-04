@@ -4,12 +4,10 @@
 
 cd /app
 
-# my spot checks
-python --version
 
-# random stuff
-which gfortran
-which f77
+# my spot checks
+echo $PATH
+
 
 # the thing we want to run clean:
 ./test_dependencies.sh

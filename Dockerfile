@@ -3,13 +3,21 @@
 
 # Staged build using builder container
 FROM scientificlinux/sl:7 as builder
-ARG GIT_TAG=master
+ARG GIT_TAG=dev
 
 RUN yum install -y git curl openssh gcc
 RUN yum install -y unzip
 RUN yum install -y make
 RUN yum install -y gcc-c++
+
+# for building R
 RUN yum install -y gcc-gfortran
+RUN yum install -y zlib-devel bzip2-devel xz-devel
+RUN yum install -y pcre pcre-devel
+RUN yum install -y libcurl-devel
+
+# for building samtools
+RUN yum install -y ncurses-devel
 
 # Checkout and build the code
 WORKDIR /app
@@ -26,8 +34,18 @@ WORKDIR /app/dependencies/Python-2.6.6
 RUN ./configure && make && make install
 
 WORKDIR /app/dependencies/R-3.4.0
-RUN ./configure --with-readline=no F77=gfortran \
+RUN ./configure --with-readline=no --with-x=no F77=gfortran \
     && make && make install
+
+WORKDIR /app/dependencies/bwa-0.5.7
+RUN make && cp ./bwa /usr/local/bin
+
+
+
+
+
+WORKDIR /app
+RUN make && make samtools && make stampy
 
 
 
@@ -35,7 +53,12 @@ RUN ./configure --with-readline=no F77=gfortran \
 COPY testscript.sh /app
 
 
-RUN rm -rf /app/dependencies
+
+# in final form, we'll remove these
+# RUN rm -rf /app/dependencies
+
+
+
 
 # Create final image
 FROM scientificlinux/sl:7
