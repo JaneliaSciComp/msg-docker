@@ -42,7 +42,7 @@ RUN ./configure --with-readline=no --with-x=no F77=gfortran \
     && make && make install
 
 WORKDIR /app/dependencies/bwa-0.5.7
-RUN make && cp ./bwa /usr/local/bin
+RUN make && cp bwa /usr/local/bin
 
 # R packages
 RUN R -e "install.packages('HiddenMarkov',dependencies=TRUE, repos='http://cran.rstudio.com/')"
@@ -65,9 +65,11 @@ RUN python setup.py install
 # Perl module
 RUN cpanm IO::Uncompress::Gunzip
 
-# build msg itself and last two executables that share its makefile
+# build msg itself and samtools, which is in same makefile
+# note this makefile makes samtools in /app/samtools, not in /app/dependencies/samtools!
 WORKDIR /app
-RUN make && make samtools && make stampy
+RUN make && make samtools \
+    && cp /app/samtools-0.1.9/samtools /usr/local/bin
 
 
 
@@ -76,7 +78,7 @@ COPY testscript.sh /app
 
 
 
-# in final form, we'll remove these
+# in final form, we'll remove these; for now, makes testing easier with them present
 # RUN rm -rf /app/dependencies
 
 
@@ -102,4 +104,4 @@ COPY --from=builder / /
 
 
 # for testing; this runs the test_dependencies.sh script
-ENTRYPOINT ["/bin/sh", "/app/testscript.sh"]
+# ENTRYPOINT ["/bin/sh", "/app/testscript.sh"]
