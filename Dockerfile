@@ -71,6 +71,16 @@ WORKDIR /app
 RUN make && make samtools \
     && cp /app/samtools-0.1.9/samtools /usr/local/bin
 
+# Stampy 1.0.23: we have to tweak the makefile for our environment, *and* do all the installation:
+WORKDIR /app/dependencies/stampy-1.0.23
+COPY makefile-stampy-1.0.23 makefile
+RUN make \
+    && cp /app/dependencies/stampy-1.0.23/stampy.py /usr/local/bin \
+    && cp /app/dependencies/stampy-1.0.23/maptools.so /usr/local/lib/python2.6/site-packages \
+    && cp -R /app/dependencies/stampy-1.0.23/Stampy /usr/local/lib/python2.6/site-packages/Stampy \
+    && cp -R /app/dependencies/stampy-1.0.23/plugins /usr/local/lib/python2.6/site-packages/plugins \
+    && cp -R /app/dependencies/stampy-1.0.23/ext /usr/local/lib/python2.6/site-packages/ext
+
 
 
 # test script, will be removed
