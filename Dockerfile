@@ -10,17 +10,19 @@ RUN yum install -y unzip
 RUN yum install -y make
 RUN yum install -y gcc-c++
 
-# for building R
+# for building and running R
 RUN yum install -y gcc-gfortran
 RUN yum install -y zlib-devel bzip2-devel xz-devel
 RUN yum install -y pcre pcre-devel
 RUN yum install -y libcurl-devel
+RUN yum install -y ghostscript
 
 # for building samtools
 RUN yum install -y ncurses-devel
 
 # for installing Perl packages
 RUN yum install -y perl-App-cpanminus
+RUN yum install -y perl-Switch
 
 # Checkout and build the code
 WORKDIR /app
@@ -65,13 +67,11 @@ RUN python setup.py install
 # Perl module
 RUN cpanm IO::Uncompress::Gunzip
 
-# msg itself and samtools, which is in same makefile
-# samtools is in the same makefile as msg; note it makes samtools 
-#   in /app/samtools, not in /app/dependencies/samtools!
+# msg, samtools, and stampy share the same makefile; note that
+# samtools and stampy build in /app, not in /app/dependencies!
 WORKDIR /app
 RUN make
 RUN make samtools && cp /app/samtools-0.1.9/samtools /usr/local/bin
-
 RUN make stampy \
     && cp /app/stampy-1.0.32/stampy.py /usr/local/bin \
     && cp /app/stampy-1.0.32/maptools.so /usr/local/lib/python2.7/site-packages \
