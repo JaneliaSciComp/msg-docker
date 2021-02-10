@@ -27,14 +27,14 @@ WORKDIR /app
 RUN git clone --branch $GIT_TAG --depth 1 https://github.com/YourePrettyGood/msg .
 
 WORKDIR /app/dependencies
-RUN curl -sO https://www.python.org/ftp/python/2.6.6/Python-2.6.6.tgz
+RUN curl -sO https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
 RUN curl -sO https://cran.r-project.org/src/base/R-3/R-3.4.0.tar.gz
 RUN cat *.{tar.gz,tgz} | tar zxvf - -i \
     && cat *.tar.bz2 | tar jxvf - -i \
     && unzip *.zip
 
 # core executables
-WORKDIR /app/dependencies/Python-2.6.6
+WORKDIR /app/dependencies/Python-2.7.18
 RUN ./configure && make && make install
 
 WORKDIR /app/dependencies/R-3.4.0
@@ -72,14 +72,14 @@ RUN make && make samtools \
     && cp /app/samtools-0.1.9/samtools /usr/local/bin
 
 # Stampy 1.0.23: we have to tweak the makefile for our environment, *and* do all the installation:
-WORKDIR /app/dependencies/stampy-1.0.23
-COPY makefile-stampy-1.0.23 makefile
-RUN make \
-    && cp /app/dependencies/stampy-1.0.23/stampy.py /usr/local/bin \
-    && cp /app/dependencies/stampy-1.0.23/maptools.so /usr/local/lib/python2.6/site-packages \
-    && cp -R /app/dependencies/stampy-1.0.23/Stampy /usr/local/lib/python2.6/site-packages/Stampy \
-    && cp -R /app/dependencies/stampy-1.0.23/plugins /usr/local/lib/python2.6/site-packages/plugins \
-    && cp -R /app/dependencies/stampy-1.0.23/ext /usr/local/lib/python2.6/site-packages/ext
+# WORKDIR /app/dependencies/stampy-1.0.23
+# COPY makefile-stampy-1.0.23 makefile
+# RUN make \
+#     && cp /app/dependencies/stampy-1.0.23/stampy.py /usr/local/bin \
+#     && cp /app/dependencies/stampy-1.0.23/maptools.so /usr/local/lib/python2.6/site-packages \
+#     && cp -R /app/dependencies/stampy-1.0.23/Stampy /usr/local/lib/python2.6/site-packages/Stampy \
+#     && cp -R /app/dependencies/stampy-1.0.23/plugins /usr/local/lib/python2.6/site-packages/plugins \
+#     && cp -R /app/dependencies/stampy-1.0.23/ext /usr/local/lib/python2.6/site-packages/ext
 
 
 
@@ -114,4 +114,4 @@ COPY --from=builder / /
 
 
 # for testing; this runs the test_dependencies.sh script
-# ENTRYPOINT ["/bin/sh", "/app/testscript.sh"]
+ENTRYPOINT ["/bin/sh", "/app/testscript.sh"]
