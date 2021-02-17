@@ -79,18 +79,7 @@ RUN make stampy \
     && cp -R /app/stampy-1.0.32/plugins /usr/local/lib/python2.7/site-packages/plugins \
     && cp -R /app/stampy-1.0.32/ext /usr/local/lib/python2.7/site-packages/ext
 
-
-
-# test script, will be removed
-COPY testscript.sh /app
-
-
-
-# in final form, we'll remove these; for now, makes testing easier with them present
-# RUN rm -rf /app/dependencies
-
-
-
+RUN rm -rf /app/dependencies
 
 # Create final image
 FROM scientificlinux/sl:7
@@ -98,18 +87,11 @@ FROM scientificlinux/sl:7
 COPY --from=builder / /
 
 
-
 # Add Tini
-# ENV TINI_VERSION v0.19.0
-# ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-# RUN chmod +x /tini
-# ENTRYPOINT ["/tini", "--"]
+ENV TINI_VERSION v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+ENTRYPOINT ["/tini", "--"]
 
 # Run your program under Tini
-# CMD ["/your/program", "-and", "-its", "arguments"]
-
-
-
-
-# for testing; this runs the test_dependencies.sh script
-# ENTRYPOINT ["/bin/sh", "/app/testscript.sh"]
+CMD ["/app/msgCluster.pl"]
