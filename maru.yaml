@@ -6,7 +6,7 @@ build_args:
 template_args:
   flavor: python_conda
   build:
-    repo_url: https://github.com/YourePrettyGood/msg
+    repo_url: https://github.com/JaneliaSciComp/msg
     command: make
   executable:
     exe_path: bin/program

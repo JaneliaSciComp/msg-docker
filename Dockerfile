@@ -24,9 +24,14 @@ RUN yum install -y ncurses-devel
 RUN yum install -y perl-App-cpanminus
 RUN yum install -y perl-Switch
 
+# required for bsub to work in the container
+RUN yum install -y python3
+
+
+
 # Checkout and build the code
 WORKDIR /app
-RUN git clone --branch $GIT_TAG --depth 1 https://github.com/YourePrettyGood/msg .
+RUN git clone --branch $GIT_TAG --depth 1 https://github.com/JaneliaSciComp/msg .
 
 WORKDIR /app/dependencies
 RUN curl -sO https://www.python.org/ftp/python/2.7.18/Python-2.7.18.tgz
