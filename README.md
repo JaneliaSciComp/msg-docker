@@ -13,13 +13,13 @@ This repo containerizes the MSG pipeline used by the Stern lab. It relies on a l
     - it's cloned into `/app`
 * Scientific Linux 7 base image
 * Python 2.7, R 3.4.0
-* many dependencies are stored in the msg repo and built from there
+* many dependencies are stored in the MSG repo and built from source
 * the rest we get from various repositories
     - yum install
     - R packages from cran.rstudio.com
     - Perl packages via CPAN
 * to support the Janelia cluster, Python 3 is also installed
-    - "python" is Python 2.7, however, as needed by MSG
+    - "python", however, resolves to Python 2.7, as needed by MSG
 
 
 ## Building
@@ -32,48 +32,43 @@ This repo containerizes the MSG pipeline used by the Stern lab. It relies on a l
 * install Docker (and optionally maru)
 * clone this repo
 * cd into repo
-* `maru build` or `docker build something something`
-    - this will take tens of minutes (an hour or more?) the first time it's run
-    - later invocations will be shorter, depending on how many cached layers of the Docker image can be reused
+* `maru build` or `docker build -t <tag> .`
+    - this will take ten minutes or more the first time it's run
+        + later invocations will be shorter, depending on how many cached layers of the Docker image can be reused
+    - `<tag>` should be msg:x.y.z (with appropriate version number x.y.z)
+
 
 **Registry**
 
-We are storing the container in the internal Janelia registry at `sternlab/msg`. To tag and upload:
+We are storing the container in the internal Janelia registry at `sternlab/msg`. To tag (using the same version number as above) and upload:
 
-* docker tag blah blah blah
-* docker push tag registry
-* note this address and tag for later use!
+* `docker tag msg:x.y.z registry.int.janelia.org/sternlab/msg:x.y.z`
+* if you aren't logged in: `docker login registry.int.janelia.org`
+* `docker push registry.int.janelia.org/sternlab/msg:x.y.z`
+    - this can take several minutes
 
-
-## Running msg
-
-`/app/msgCluster.pl` is the default entry point of the container.
+Note this address and tag for later use!
 
 
-**Single computer**
+## Running MSG on the Janelia cluster
 
-* cd into data directory
-* be sure `cluster=0` in `msg.cfg`
-* `maru run` or `docker run something something`
-
-
-**Cluster**
+Note that `/app/msgCluster.pl` is the default entry point of the container. If you need to run (eg) `msgUpdateParentals.pl`, you will need to open a shell in the container and do it there.
 
 These instructions are for the Janelia cluster using Singularity to run the Docker container.
 
-* cd into data dir
 * adjust `msg.cfg`
-    - add bsub submit line
-    - set cluster=1
-    - add container line
-    - do not set any paths or file locations
-* submit with this: blah blah blah
+    - adjust the submit command line:
+        `submit_cmd = source /misc/lsf/conf/profile.lsf; bsub -J $jobname -o $logdir/$jobname.stdout -e $logdir/$jobname.stderr -o $logdir/$jobname.stdout -e $logdir/$jobname.stderr`
+    - set `cluster=1`
+    - add a line for the container options; make sure the address and version number (x.y.z) are correct and current:
+        `default_container_options = singularity exec docker://registry.int.janelia.org/sternlab/msg:x.y.z`
+    - _do not_ set any paths or file locations within MSG
+* log on to a cluster submit host
+* cd into your data dir
+* submit using this line, again:
+    `bsub -n 1 singularity run -B /misc/lsf docker://registry.int.janelia.org/sternlab/msg:x.y.z`
 
-**Shell access**
 
-If you need interactive access to the container:
-
-* `maru shell` or `docker -it exec containername /bin/bash`
 
 
 
