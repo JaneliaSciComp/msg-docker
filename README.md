@@ -2,7 +2,7 @@
 
 This repo containerizes the MSG "Multiplexed Shotgun Genotyping" pipeline found [here](https://github.com/JaneliaSciComp/msg). The pipeline relies on a lot of very old dependencies, so we've frozen it in approximately its late-2020 state to ensure it can be run into the future in whatever environment is available.
 
-This documentation is not meant to replace (Docker documentation)[https://docs.docker.com]. However, if you've installed Docker and gone through even the first pages of the both the Docker and Docker Hub QuickStarts, you will probably be able to follow the instructions for running the MSG container from Docker Hub. If you want to build the container yourself, you'll need a bit more Docker experience. 
+This documentation is not meant to replace [Docker documentation](https://docs.docker.com). However, if you've installed Docker and gone through even the first pages of the both the Docker and Docker Hub QuickStarts, you will probably be able to follow the instructions for running the MSG container from Docker Hub. If you want to build the container yourself, you'll need a bit more Docker experience. 
 
 ## Container contents
 
@@ -22,7 +22,7 @@ This documentation is not meant to replace (Docker documentation)[https://docs.d
 
 ## Building
 
-We use (maru)[https://github.com/JaneliaSciComp/maru] to build the container, but you can build with Docker as well.
+We use [maru](https://github.com/JaneliaSciComp/maru) to build the container, but you can build with Docker as well.
 
 * install Docker (and optionally maru)
 * clone this repo
@@ -48,7 +48,7 @@ See below for an example of how we run MSG on our LSF cluster using Singularity.
 **Note:** Since `/app/msgCluster.pl` is the default entry point of the container, if you need to run (eg) `msgUpdateParentals.pl`, you will need to open a shell in the container and do it there.
 
 
-## Running MSG on the Janelia cluster
+## Running on the Janelia cluster
 
 These instructions are for the Janelia cluster using Singularity to run the Docker container.
 
