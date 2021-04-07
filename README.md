@@ -33,36 +33,46 @@ We use [maru](https://github.com/JaneliaSciComp/maru) to build the container, bu
     - `<tag>` should be `msg:x.y.z` (with appropriate version number x.y.z)
     - if you build with maru, the tag will be set as specified in `maru.yaml`
 
-## Running
+## Running on a single computer
 
 Full documentation on running MSG is found in [its repo](https://github.com/JaneliaSciComp/msg). This is a summary of the steps needed to run it within a Docker container. You should prepare your data and configuration files as you would for running without using a container.
 
 The Docker image is availabe on Docker Hub at `docker://janeliascicomp/msg:x.y.z`, where x.y.z is the version number. `msgCluster.pl` is run by default when you run the container. So to run `msgCluster.pl` as you would interactively, you will `cd` into your data directory and issue a command like this (using a valid version number):
 
-`docker run --rm docker://janeliascicomp/msg:x.y.z`
+`docker run -v <datadir>:<datadir> --rm docker://janeliascicomp/msg:x.y.z`
 
-If you have a cluster that is capable of running containers, you should adjust your `msg.cfg` as normal for cluster use. There is an additional option `default_container_options` where you will specify the commands your cluster requires to retrieve and run the container from Docker Hub.
-
-See below for an example of how we run MSG on our LSF cluster using Singularity.
+where `<datadir>` is the path to your data directory.
 
 **Note:** Since `/app/msgCluster.pl` is the default entry point of the container, if you need to run (eg) `msgUpdateParentals.pl`, you will need to open a shell in the container and do it there.
 
+## Running on a cluster
+
+If you have a cluster that is capable of running containers, you should adjust your `msg.cfg` as normal for cluster use. There is an additional option `default_container_options` where you will specify the commands your cluster requires to retrieve and run the container from Docker Hub.
+
+Additionally, since MSG starts multiple jobs, you **should not** retrieve the container from Docker Hub (or any other registry) for each job. For a cluster that uses Singularity, you should build the Singularity container once and run that container in each submitted job. See below for an example of how we run MSG on our LSF cluster using Singularity.
 
 ## Running on the Janelia cluster
 
 These instructions are for the Janelia cluster using Singularity to run the Docker container.
 
+* create a Singularity container
+    - this only needs to be done once each time MSG is updated
+    - choose a location `<sif-location>` on your file system that will be accessible at submit time and to all running jobs 
+    - log on to a computer that has Singularity installed
+    - build the Singularity container:
+        `singularity build <sif-location>/msg.sif docker://janeliascicomp/msg:x.y.z`
 * adjust `msg.cfg`
     - adjust the submit command line:
         `submit_cmd = source /misc/lsf/conf/profile.lsf; bsub -J $jobname -o $logdir/$jobname.stdout -e $logdir/$jobname.stderr -o $logdir/$jobname.stdout -e $logdir/$jobname.stderr`
     - set `cluster=1`
     - add a line for the container options; make sure the address and version number (x.y.z) are correct and current:
-        `default_container_options = singularity exec docker://janeliascicomp/msg:x.y.z`
+        `default_container_options = singularity exec <sif-location>/msg.sif`
     - _do not_ explicitly specify any file paths for anything in the container
-* log on to a cluster submit host
-* cd into your data dir
-* submit using this line:
-    `bsub -n 1 singularity run -B /misc/lsf docker://janeliascicomp/msg:x.y.z`
+* run the container
+    - log on to a cluster submit host
+    - cd into your data dir
+    - submit using this line:
+        `bsub -n 1 singularity run -B /misc/lsf <sif-location>/msg.sif`
 
 We are also storing the container in the internal Janelia registry as `sternlab/msg:x.y.z`. If you prefer, you can retrieve the container from there instead of Docker Hub.
 
